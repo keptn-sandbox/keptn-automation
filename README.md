@@ -1,0 +1,1 @@
+# keptn-quality-gate-wrapper-bash
