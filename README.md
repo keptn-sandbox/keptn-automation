@@ -10,7 +10,7 @@ Script logic:
 
 # Setup
 
-1. This assumes you are using ```Keptn 0.6.0``` and have a service onboarded.  See example setup and in this [README](https://github.com/grabnerandi/keptn-qualitygate-examples/blob/master/sample/README.md).  You will need the following values as parameters to the quality gate.
+1. This assumes you are using `Keptn 0.6.0` and have a service onboarded.  See example setup and in this [README](https://github.com/grabnerandi/keptn-qualitygate-examples/blob/master/sample/README.md).  You will need the following values as parameters to the quality gate.
 
     * Keptn API URL
     * Keptn Token
