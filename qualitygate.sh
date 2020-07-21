@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
+# default the variables if not set
 DEBUG=${DEBUG:="false"}
 PROCESS_TYPE=${PROCESS_TYPE:="ignore"}
+TEST_STRATEGY=${TEST_STRATEGY:="detached"}
+WAIT_LOOPS=${WAIT_LOOPS:="20"}
+SOURCE=${SOURCE:="unknown"}
 
 # Required parameters
 KEPTN_URL=${KEPTN_URL:?'KEPTN_URL ENV variable missing.'}
@@ -11,7 +15,6 @@ END=${END:?'END ENV variable missing.'}
 PROJECT=${PROJECT:?'PROJECT ENV variable missing.'}
 SERVICE=${SERVICE:?'SERVICE ENV variable missing.'}
 STAGE=${STAGE:?'STAGE ENV variable missing.'}
-SOURCE=${SOURCE:?'SOURCE ENV variable is missing'}
 
 echo "================================================================="
 echo "Keptn Quality Gate:"
@@ -25,6 +28,9 @@ echo "STAGE          = $STAGE"
 echo "LABELS         = $LABELS"
 echo "SOURCE         = $SOURCE"
 echo "PROCESS_TYPE   = $PROCESS_TYPE"
+echo "TEST_STRATEGY  = $TEST_STRATEGY"
+echo "WAIT_LOOPS     = $WAIT_LOOPS"
+echo "DEBUG          = $DEBUG"
 echo "================================================================="
 
 # build up POST_BODY variable
@@ -34,18 +40,20 @@ POST_BODY="${POST_BODY}\"end\":\"${END}\","
 POST_BODY="${POST_BODY}\"project\":\"${PROJECT}\","
 POST_BODY="${POST_BODY}\"service\":\"${SERVICE}\","
 POST_BODY="${POST_BODY}\"stage\":\"${STAGE}\","
-POST_BODY="${POST_BODY}\"teststrategy\":\"manual\""
+POST_BODY="${POST_BODY}\"teststrategy\":\"${TEST_STRATEGY}\""
+
+# add in labels if passed in
 [ ! -z "$LABELS" ] && POST_BODY="${POST_BODY},\"labels\":${LABELS}"
+
 # add the closing bracket
 POST_BODY="${POST_BODY}},"
 POST_BODY="${POST_BODY}\"type\":\"sh.keptn.event.start-evaluation\","
 POST_BODY="${POST_BODY}\"source\":\"${SOURCE}\"}"
 
 if [[ "${DEBUG}" == "true" ]]; then
-  echo "KEPTN_URL = $KEPTN_URL"
-  echo "---"
+  echo "---START DEBUG---"
   echo "POST_BODY = $POST_BODY"
-  echo "---"
+  echo "---END DEBUG---"
   ARGS+=( --verbose )
 fi
 
@@ -59,15 +67,14 @@ else
   echo "keptnContext ID = $ctxid"
 fi
 
-loops=20
 i=0
-while [ $i -lt $loops ]
+while [ $i -lt $WAIT_LOOPS ]
 do
     i=`expr $i + 1`
     result=$(curl -s -k -X GET "${KEPTN_URL}/v1/event?keptnContext=${ctxid}&type=sh.keptn.events.evaluation-done" -H "accept: application/json" -H "x-token: ${KEPTN_TOKEN}")
     status=$(echo $result|jq -r ".data.evaluationdetails.result")
     if [ "$status" = "null" ]; then
-      echo "Waiting for results (attempt $i of 20)..."
+      echo "Waiting for results (attempt $i of $WAIT_LOOPS)..."
       sleep 10
     else
       break
