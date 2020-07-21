@@ -24,6 +24,9 @@ param(
 [Parameter(Position=7,mandatory=$true)] 
 [string]$Stage,
 
+[Parameter(Position=8,mandatory=$true)] 
+[string]$Source,
+
 [Parameter()]
 [string]$Labels,
 
@@ -46,7 +49,8 @@ Write-Host "End            = $End"
 Write-Host "Project        = $Project"
 Write-Host "Service        = $Service"
 Write-Host "Stage          = $Stage"
-Write-Host "Labels          = $Labels"
+Write-Host "Labels         = $Labels"
+Write-Host "Source         = $Source"
 Write-Host "ProcessType    = $ProcessType"
 Write-Host "DebugLevel     = $DebugLevel"
 Write-Host "==============================================="
@@ -60,6 +64,7 @@ docker run -i `
     --env SERVICE=$Service `
     --env STAGE=$Stage `
     --env LABELS=$Labels `
+    --env SOURCE=$Source `
     --env PROCESS_TYPE=$ProcessType `
     --env DEBUG=$DebugLevel `
     $image
