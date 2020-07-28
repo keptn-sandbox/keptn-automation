@@ -1,86 +1,98 @@
 # Overview
 
-Dockerized Bash script that will call the Keptn Quality Gate API.  
+Dockerized script that will perform the logic to perform a Keptn SLO evaluation.  
 
 Script logic:
-1. calls the ```start evaluation``` Keptn API and save the ```keptncontext  ID``` from the response
-1. while loop with 30 second wait between calls to ```evaluate results``` Keptn API using the ```keptncontext  ID```
-1. Keptn will return value of ```pass```, ```fail```, or ```warning``` in the JSON response
-1. if status is NOT ```pass``` then Docker will exit with status of 1
-
-# Setup
-
-1. This assumes you are using `Keptn 0.6.0` and have a service onboarded.  See example setup and in this [README](https://github.com/grabnerandi/keptn-qualitygate-examples/blob/master/sample/README.md).  You will need the following values as parameters to the quality gate.
-
-    * Keptn API URL
-    * Keptn Token
-    * Project
-    * Service
-    * Stage
-    * Evalation start time (UTC)
-    * Evalation end time (UTC)
-
-1. Use this command to get your Keptn API URL
-    ```
-    keptn status
-    ```
-
-1. Use this command to get your Keptn Token
-    ```
-    echo "$(kubectl get secret keptn-api-token -n keptn -ojsonpath={.data.keptn-api-token} | base64 --decode)"
-    ```
+1. For the provided Keptn project, service, and stage, send a `sh.keptn.event.start-evaluation` event to the Keptn Event API and saves the `keptncontext ID` returned from the response
+1. Loop and call the Keptn API every 10 seconds using the `keptncontext ID` to retrieve results
+1. If there is no response with the number loops set by the `WAIT_LOOPS`, then exit with status 1
+1. If there is a response from Keptn, then Docker will exit with status of 1 or 0 based on the logic behind the passed in `process_type` argument:
+    * If the Keptn status = `ignore`, then always return zero
+    * If the Keptn status = `pass_on_warning`, then - return zero unless keptn status equals fail
+    * If the Keptn status = `fail_on_warning`, then - return zero unless keptn status equals fail or warn
 
 # Usage
 
-Call the ```docker run``` command as shown in this example.  
+Assumption for setup:
+* Using `Keptn 0.7.x` and have a service onboarded.  See example this repo for example for how to setup keptn on k3s with a sample application - https://github.com/dt-demos/keptn-k3s-demo
+* Have docker to run the `docker run` command
+* Use the pre-built `robjahn/keptn-quality-gate-bash` image or build your own image.
 
-    ```
-    image=robjahn/keptn-quality-gate-bash
-    keptnApiUrl=https://api.keptn.<YOUR KEPTN DOMAIN>
-    keptnApiToken=<YOUR KEPTN TOKEN>
-    startTime=2019-11-21T11:00:00.000Z
-    endTime=2019-11-21T11:00:10.000Z
-    project=keptnorders
-    service=frontend
-    stage=staging
-    debug=true
-
-    docker run -it --rm \
-        --env KEPTN_URL=$keptnApiUrl \
-        --env KEPTN_TOKEN=$keptnApiToken \
-        --env START=$start \
-        --env END=$end \
-        --env PROJECT=$project \
-        --env SERVICE=$service \
-        --env STAGE=$stage \
-        --env DEBUG=$debug \
-        $image
-    ```
-
-NOTES:
-  * The ```START``` and ```END``` parameters is in ISO format: ```YYYY-MM-DDTHH:MM:SSZ```
-  * Add the ```--env debug=true``` parameter to get additonal details
-  * This pre-built image can be used if you don't want to make build your own. ```robjahn/keptn-quality-gate-bash```
-
-# Helper scripts
-
-* ```run.sh``` calls the ```docker run``` command with the required arguments
-* ```buildrun.sh``` builds local docker image and then calls the ```run.sh``` script
-* Make a ```test.sh``` script (included part of .gitignore) with your unique arguments as shown below:
+Call the `docker run` command as shown in this example. 
 
 ```
 #!/bin/bash
 
 image=robjahn/keptn-quality-gate-bash
-keptnApiUrl=https://api.keptn.XXXX
-keptnApiToken=XXXX
-start=2019-11-21T11:00:00.000Z
-end=2019-11-21T11:10:00.000Z
-project=keptnorders
-service=frontend
-stage=staging
+keptnApiUrl=https://api.keptn.<YOUR KEPTN DOMAIN>
+keptnApiToken=<YOUR KEPTN TOKEN>
+start=2020-07-23T21:22:20Z
+end=2020-07-23T21:22:37Z
+project=demo
+service=simplenodeservice
+stage=dev
+source=detached
+processType=pass_on_warning     # e.g. ignore, pass_on_warning, fail_on_warning
 debug=true
+build=123                      
 
-./buildrun.sh $image $keptnApiUrl $keptnApiToken $start $end $project $service $stage $debug
+docker run -it --rm \
+    --env KEPTN_URL=$keptnApiUrl \
+    --env KEPTN_TOKEN=$keptnApiToken \
+    --env START=$start \
+    --env END=$end \
+    --env PROJECT=$project \
+    --env SERVICE=$service \
+    --env STAGE=$stage \
+    --env SOURCE=$source \
+    --env PROCESS_TYPE=$processType \
+    --env DEBUG=$debug \
+    --env LABELS='{"source":"'$source'","build":"'$build'"}' \
+    $image
+```
+
+Refer to the table below for parameters:
+
+| Required | Name | Description | Valid Values | Default |
+|:---:|---|---|---|---|
+| Y | KEPTN_URL | URL to Keptn API (1) | example https://api.keptn.11.22.33.44/api  |  |
+| Y | KEPTN_TOKEN | Keptn API Token (2) |  |  |
+| Y | START | Evaluation Start Time | ISO format: `YYYY-MM-DDTHH:MM:SSZ` |  |
+| Y | END | Evaluation End Time | ISO format: `YYYY-MM-DDTHH:MM:SSZ`  |  |
+| Y | PROJECT | Keptn Project Name | example: keptnorders  |  |
+| Y | SERVICE | Keptn Service Name | example: frontend  |  |
+| Y | STAGE | Keptn Stage Name | example: staging  |  ||   | PROCESS_TYPE | How the Docker script will process the Keptn results| ignore, pass_on_warning, fail_on_warning  | ignore |
+|   | WAIT_LOOPS | Number of loops to wait for results. Each loop is 10 seconds |  | 20 |
+|   | SOURCE | Description for the evaluation request |   | unknown |
+|   | LABELS | Keptn labels | Json key-pair array with escaped quotes | see usage example below | |
+|   | DEBUG | Detailed Messsage | true, false  | false |
+|   | TEST_STRATEGY | Keptn test strategy |  | detached |
+
+*Footnotes:*
+
+(1) Use this command to get your Keptn API URL
 
 ```
+keptn status
+```
+
+(2) Use this command to get your Keptn Token.  If not unix, then refer to [keptn docs](https://keptn.sh/docs/0.7.x/operate/install/#authenticate-keptn-cli).
+
+```
+echo "$(kubectl get secret keptn-api-token -n keptn -ojsonpath={.data.keptn-api-token} | base64 --decode)"
+```
+
+# Development
+
+Use the following helper unix bash scripts to build and test the docker image
+
+* `buildpush.sh` builds local docker image and then pushes it to registry
+* `buildtest.sh` builds local docker image and then calls the `test.sh` script
+
+Local setup
+
+1. Copy the example from the `usage` section above into a file called `test.sh` and then adjust the values for your testing. Note that `test.sh` is part of `.gitignore` so fill in your unique arguments and they won't be saved to the repo.
+
+1. After you save the file run `chmod +x test.sh`
+
+1. Test by just calling `./test.sh` and review the results in your Keptn Bridge UI
