@@ -1,6 +1,12 @@
 # Overview
 
-Dockerized script that will perform the logic to perform a Keptn SLO evaluation.  
+Dockerized script that will perform the logic to perform a [Keptn SLO evaluation](https://keptn.sh/docs/0.7.x/quality_gates/) often referred to as a `quality gate`.
+
+Use Cases:
+* Add this following a performance test to automate results analysis
+* Add this to code pipeline as a quality gate prior to deploying to another environment
+* Add this to following the performance test of individual services as a prerequisite quality gate to integrated tests
+* Add this following a deployment based on real-user traffic to ensure it was successful
 
 Script logic:
 1. For the provided Keptn project, service, and stage, send a `sh.keptn.event.start-evaluation` event to the Keptn Event API and saves the `keptncontext ID` returned from the response
