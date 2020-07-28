@@ -8,6 +8,4 @@ RUN apk add curl
 
 COPY qualitygate.sh /
 
-ARG KEPTN_URL
-
 ENTRYPOINT ["/qualitygate.sh"]
