@@ -16,6 +16,11 @@ PROJECT=${PROJECT:?'PROJECT ENV variable missing.'}
 SERVICE=${SERVICE:?'SERVICE ENV variable missing.'}
 STAGE=${STAGE:?'STAGE ENV variable missing.'}
 
+if [ "${KEPTN_URL: -4}" != "/api" ]; then
+  echo "Aborting: KEPTN_URL must end with /api"
+  exit 1
+fi
+
 echo "================================================================="
 echo "Keptn Quality Gate:"
 echo ""
@@ -51,15 +56,21 @@ POST_BODY="${POST_BODY}\"type\":\"sh.keptn.event.start-evaluation\","
 POST_BODY="${POST_BODY}\"source\":\"${SOURCE}\"}"
 
 if [[ "${DEBUG}" == "true" ]]; then
-  echo "---START DEBUG---"
+  echo ""
   echo "POST_BODY = $POST_BODY"
-  echo "---END DEBUG---"
-  ARGS+=( --verbose )
+  echo ""
 fi
 
 echo "Sending start Keptn Evaluation"
-ctxid=$(curl -s -k -X POST --url "${KEPTN_URL}/v1/event" -H "Content-type: application/json" -H "x-token: ${KEPTN_TOKEN}" -d "$POST_BODY"|jq -r ".keptnContext")
+POST_RESPONSE=$(curl -s -k -X POST --url "${KEPTN_URL}/v1/event" -H "Content-type: application/json" -H "x-token: ${KEPTN_TOKEN}" -d "$POST_BODY")
 
+if [[ "${DEBUG}" == "true" ]]; then
+  echo ""
+  echo "POST_RESPONSE = $POST_RESPONSE"
+  echo ""
+fi
+
+ctxid=$(echo $POST_RESPONSE|jq -r ".keptnContext")
 if [ -z "${ctxid}" ]; then
   echo "Aborting: keptnContext ID not returned"
   exit 1
@@ -87,17 +98,18 @@ echo $result|jq > $filename
 cat $filename
 
 echo "================================================================="
-echo "eval status = ${status}"
-echo "eval result = $(echo $result|jq)"
+echo "Result = $(echo $result|jq)"
+echo "Status = ${status}"
 echo "================================================================="
 
 # determine if process the result
 if [ "${PROCESS_TYPE}" != "pass_on_warning" ] && [ "${PROCESS_TYPE}" != "fail_on_warning" ]; then
+  echo "Ignoring Evaluation Logic"
   exit
 fi
 
 if [ "$status" = "pass" ]; then
-  success "Keptn Quality Gate - Evaluation Succeeded"
+  echo "Keptn Quality Gate - Evaluation Succeeded"
 elif [ "$status" = "warning" ]; then
   if [ "${PROCESS_TYPE}" == "fail_on_warning" ]; then
     echo "Keptn Quality Gate - Got Warning status. Evaluation failed!"
