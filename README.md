@@ -1,104 +1,160 @@
 # Overview
 
-Dockerized script that will perform the logic to perform a [Keptn SLO evaluation](https://keptn.sh/docs/0.7.x/quality_gates/) often referred to as a `quality gate`.
+Container image containing logic to integrate Keptn into your DevOps scripts and software delivery pipelines.  
 
-Use Cases:
+# Container Images
+
+| Container Image Tag | Keptn Supported Version | Comment |
+| ------------------- | ----------------------- | --------|
+| dtdemos/keptn-automation:1 | 0.8.3 | Initial version |
+
+# Usage - using Docker
+
+Any inputs are specified as environment variables as shown below with the script to invoke. For example calling a script such as `onboard-service.sh`:
+
+```
+docker run -it --rm \
+    --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+    --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+    --env ...
+    --env ...
+    $IMAGE \
+    onboard-service.sh
+```
+
+# Script Details
+
+Supported Scripts are described in detail in this section:
+* `onboard-service.sh`
+* `create-dynatrace-secret.sh`
+* `slo-evaluation.sh`
+* `keptn.sh`
+
+See the `test/` folder for examples of each script.
+
+## `onboard-service.sh`
+
+Use this action type to [onboard a service](https://keptn.sh/docs/0.8.x/manage/). **Requires that a Docker volume is specified to the files that will be processed.**
+
+**Script logic**
+
+1. call `keptn auth`
+1. if project does not exist, call `keptn create project` 
+1. if service does not exist, call `keptn create service` 
+1. if KEPTN_SLO_FILE provided, call `keptn add-resource` to add SLO file as a keptn resource
+1. if `CONFIGURE_DT_MONITORING = true`
+    * call `keptn add-resource` to add `dynatrace.conf.yaml` as a keptn resource
+    * if `DT_SLI_FILE` provided, call `keptn add-resource` to add `dynatrace/sli.yaml` as a keptn resource
+
+**Docker environment variables**
+| Variable | Description | Required | Default |
+| -------- | ----------- | ---------| ------- |
+| KEPTN_BASE_URL | Keptn Tenant URL  | **Yes** | |
+| KEPTN_API_TOKEN | Keptn API Token  | **Yes** | |
+| KEPTN_PROJECT | Keptn Project Name | **Yes** | |
+| KEPTN_SERVICE | Keptn Service Name | **Yes** | |
+| KEPTN_STAGE | Keptn Stage Name | **Yes** | |
+| KEPTN_SHIPYARD_FILE | Keptn Shipyard filename | **Yes** | |
+| KEPTN_SLO_FILE | Keptn SLO filename | **Yes** | |
+| CONFIGURE_DT_MONITORING | Set to `true` or `false` |  | false |
+| DT_SLI_FILE | Dynatrace SLI filename |  |  |
+| DT_CONF_FILE | Dynatrace Configuration filename. Required if `CONFIGURE_DT_MONITORING=true` | **Depends** |  |
+| DEBUG | Set to `true` or `false` | | false |
+
+## `create-dynatrace-secret.sh`
+
+Use this action type to [create Dynatrace secret with required credentials](https://keptn.sh/docs/0.8.x/monitoring/dynatrace/install/#1-create-a-secret-with-required-credentials). 
+
+**Script logic**
+
+1. call `keptn auth`
+1. call `keptn delete secret dynatrace`
+1. call `keptn create secret dynatrace`
+
+**Docker environment variables**
+| Variable | Description | Required | Default |
+| -------- | ----------- | ---------| ------- |
+| KEPTN_BASE_URL | Keptn Tenant URL  | **Yes** | |
+| KEPTN_API_TOKEN | Keptn API Token  | **Yes** | |
+| DT_BASE_URL | Dynatrace Tenant URL such as http://abc.live.dynatrace.com | **Yes** | |
+| DT_API_TOKEN | Dynatrace API Token  | **Yes** | |
+| DEBUG | Set to `true` or `false` | | false |
+
+## `slo-evaluation.sh`
+
+Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.8.x/quality_gates/get_started/)
+
+**Use Cases:**
 * Add this following a performance test to automate results analysis
-* Add this to code pipeline as a quality gate prior to deploying to another environment
+* Add this to code pipeline as a `quality gate` prior to deploying to another environment
 * Add this to following the performance test of individual services as a prerequisite quality gate to integrated tests
 * Add this following a deployment based on real-user traffic to ensure it was successful
 
-Script logic:
-1. For the provided Keptn project, service, and stage, send a `sh.keptn.event.start-evaluation` event to the Keptn Event API and saves the `keptncontext ID` returned from the response
-1. Loop and call the Keptn API every 10 seconds using the `keptncontext ID` to retrieve results
-1. If there is no response with the number loops set by the `WAIT_LOOPS`, then exit with status 1
+**Script logic**
+
+1. call `keptn auth`
+1. For the provided Keptn project, service, and stage, call `keptn trigger evaluation` event and save the `Keptn Context ID` returned from the response
+1. Loop and call the Keptn API every 10 seconds using the `Keptn Context ID` to retrieve results
+    * If there is no response with the number loops set by the `WAIT_LOOPS`, then exit with status 1
 1. If there is a response from Keptn, then Docker will exit with status of 1 or 0 based on the logic behind the passed in `process_type` argument:
     * If the Keptn status = `ignore`, then always return zero
     * If the Keptn status = `pass_on_warning`, then - return zero unless keptn status equals fail
     * If the Keptn status = `fail_on_warning`, then - return zero unless keptn status equals fail or warn
 
-# Usage
+**Docker environment variables**
+| Variable | Description | Required | Default |
+| -------- | ----------- | ---------| ------- |
+| KEPTN_BASE_URL | Keptn Tenant URL  | **Yes** | |
+| KEPTN_API_TOKEN | Keptn API Token  | **Yes** | |
+| KEPTN_BRIDGE_URL | Keptn Bridge URL  | | value of `KEPTN_BASE_URL` variable |
+| KEPTN_PROJECT | Keptn Project Name | **Yes** | |
+| KEPTN_SERVICE | Keptn Service Name | **Yes** | |
+| KEPTN_STAGE | Keptn Stage Name | **Yes** | |
+| EVALUATION_RULE | Must be value of `ignore`, `pass_on_warning`, or `fail_on_warning` | **Yes** | ignore |
+| TEST_STRATEGY | Custom metadata field | **Yes** | detached |
+| WAIT_LOOPS | Number of waiting loops for the evaluation to complete| **Yes** | 20 |
+| SOURCE | Custom metadata field | **Yes** | unknown |
+| START | Evaluation Start Time in format of 2021-06-09T21:00:00 | |
+| LABELS | Custom metadata data in format of a comma separated list - example `buildId=1,executedBy=manual​` | |
+| END | Evaluation End Time in format of 2021-06-09T21:00:00. Required if specify `START` variable. | Depends | |
+| TIMEFRAME | Evaluation time frame. Start time is now unless `START` variable. | | 5m |
+| DEBUG | Set to `true` or `false` | | false |
 
-Assumption for setup:
-* Using `Keptn 0.7.x` and have a service onboarded.  See example this repo for example for how to setup keptn on k3s with a sample application - https://github.com/dt-demos/keptn-k3s-demo
-* Have docker to run the `docker run` command
-* Use the pre-built `robjahn/keptn-quality-gate-bash` image or build your own image.
+## `keptn.sh`
 
-Call the `docker run` command as shown in this example. 
+Use this action type to call the [Keptn CLI](https://keptn.sh/docs/0.8.x/reference/cli/).  The action requires that the Kpetn URL and API token are provided. The arguments to `keptn.sh` are are the arguments as specfied in the keptn CLI.
+
+For example:
 
 ```
-#!/bin/bash
-
-image=robjahn/keptn-quality-gate-bash
-keptnApiUrl=https://api.keptn.<YOUR KEPTN DOMAIN>
-keptnApiToken=<YOUR KEPTN TOKEN>
-start=2020-07-23T21:22:20Z
-end=2020-07-23T21:22:37Z
-project=demo
-service=simplenodeservice
-stage=dev
-source=detached
-processType=pass_on_warning     # e.g. ignore, pass_on_warning, fail_on_warning
-debug=true
-build=123                      
-
 docker run -it --rm \
-    --env KEPTN_URL=$keptnApiUrl \
-    --env KEPTN_TOKEN=$keptnApiToken \
-    --env START=$start \
-    --env END=$end \
-    --env PROJECT=$project \
-    --env SERVICE=$service \
-    --env STAGE=$stage \
-    --env SOURCE=$source \
-    --env PROCESS_TYPE=$processType \
-    --env DEBUG=$debug \
-    --env LABELS='{"source":"'$source'","build":"'$build'"}' \
-    $image
+    --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+    --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+    $IMAGE \
+    keptn.sh get project
 ```
 
-Refer to the table below for parameters:
+**Script logic**
 
-| Required | Name | Description | Valid Values | Default |
-|:---:|---|---|---|---|
-| Y | KEPTN_URL | URL to Keptn API (1) | example https://api.keptn.11.22.33.44/api  |  |
-| Y | KEPTN_TOKEN | Keptn API Token (2) |  |  |
-| Y | START | Evaluation Start Time | ISO format: `YYYY-MM-DDTHH:MM:SSZ` |  |
-| Y | END | Evaluation End Time | ISO format: `YYYY-MM-DDTHH:MM:SSZ`  |  |
-| Y | PROJECT | Keptn Project Name | example: keptnorders  |  |
-| Y | SERVICE | Keptn Service Name | example: frontend  |  |
-| Y | STAGE | Keptn Stage Name | example: staging  |  ||   | PROCESS_TYPE | How the Docker script will process the Keptn results| ignore, pass_on_warning, fail_on_warning  | ignore |
-|   | WAIT_LOOPS | Number of loops to wait for results. Each loop is 10 seconds |  | 20 |
-|   | SOURCE | Description for the evaluation request |   | unknown |
-|   | LABELS | Keptn labels | Json key-pair array with escaped quotes | see usage example below | |
-|   | DEBUG | Detailed Messsage | true, false  | false |
-|   | TEST_STRATEGY | Keptn test strategy |  | detached |
+1. call `keptn auth`
+1. run the keptn command provided such as `keptn get projects`
 
-*Footnotes:*
-
-(1) Use this command to get your Keptn API URL
-
-```
-keptn status
-```
-
-(2) Use this command to get your Keptn Token.  If not unix, then refer to [keptn docs](https://keptn.sh/docs/0.7.x/operate/install/#authenticate-keptn-cli).
-
-```
-echo "$(kubectl get secret keptn-api-token -n keptn -ojsonpath={.data.keptn-api-token} | base64 --decode)"
-```
+**Docker environment variables**
+| Variable | Description | Required | Default |
+| -------- | ----------- | ---------| ------- |
+| KEPTN_BASE_URL | Keptn Tenant URL  | **Yes** | |
+| KEPTN_API_TOKEN | Keptn API Token  | **Yes** | |
 
 # Development
 
-Use the following helper unix bash scripts to build and test the docker image
+Use `buildpush.sh` script builds a the container image and asks to push it to specified container registry.
 
-* `buildpush.sh` builds local docker image and then pushes it to registry
-* `buildtest.sh` builds local docker image and then calls the `test.sh` script
+# Development Testing using Docker
 
-Local setup
+1. Copy the `test.template.sh` file one called `test.sh`. Note that `test.sh` is part of `.gitignore` so fill in your unique arguments and they won't be saved to the repo.
 
-1. Copy the example from the `usage` section above into a file called `test.sh` and then adjust the values for your testing. Note that `test.sh` is part of `.gitignore` so fill in your unique arguments and they won't be saved to the repo.
+1. Adjust the variables with required secrets values as well as what tests to run
 
-1. After you save the file run `chmod +x test.sh`
+1. Run `chmod +x test.sh`
 
-1. Test by just calling `./test.sh` and review the results in your Keptn Bridge UI
+1. Run `./test.sh` to execute test
