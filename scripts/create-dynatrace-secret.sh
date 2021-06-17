@@ -30,7 +30,7 @@ keptn delete secret dynatrace
 
 echo "-----------------------------------------------------------------"
 echo "keptn create secret"
-keptn_cmd=$(echo keptn create secret dynatrace --from-literal=\""DT_BASE_URL="$DT_BASE_URL"\"--from-literal=\"KEPTN_API_TOKEN="$KEPTN_API_TOKEN"\"--from-literal=\"KEPTN_API_URL="$KEPTN_BASE_URL"/api\"--from-literal=\"KEPTN_BRIDGE_URL="$KEPTN_BASE_URL"/bridge\"--from-literal=\"DT_API_TOKEN="$DT_API_TOKEN""\")
+keptn_cmd=$(echo keptn create secret dynatrace --from-literal=\""DT_TENANT="$DT_BASE_URL"\" --from-literal=\"KEPTN_API_TOKEN="$KEPTN_API_TOKEN"\" --from-literal=\"KEPTN_API_URL="$KEPTN_BASE_URL"/api\" --from-literal=\"KEPTN_BRIDGE_URL="$KEPTN_BASE_URL"/bridge\" --from-literal=\"DT_API_TOKEN="$DT_API_TOKEN""\")
 if [[ "${DEBUG}" == "true" ]]; then
     echo "keptn keptn create secret command:"
     echo $keptn_cmd
