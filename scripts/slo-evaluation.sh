@@ -22,7 +22,7 @@ KEPTN_SERVICE=${KEPTN_SERVICE:?'KEPTN_SERVICE envionmment variable missing.'}
 KEPTN_STAGE=${KEPTN_STAGE:?'KEPTN_STAGE envionmment variable missing.'}
 
 # default the bridge URL if not provided
-if [ ! -z "$KEPTN_BRIDGE_URL" ]; then
+if [ -z "$KEPTN_BRIDGE_URL" ]; then
   KEPTN_BRIDGE_URL=$KEPTN_BASE_URL
 fi
 
