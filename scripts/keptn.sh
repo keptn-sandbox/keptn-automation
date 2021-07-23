@@ -4,12 +4,9 @@
 KEPTN_BASE_URL=${KEPTN_BASE_URL:?'KEPTN_BASE_URL envionmment variable missing.'}
 KEPTN_API_TOKEN=${KEPTN_API_TOKEN:?'KEPTN_API_TOKEN envionmment variable missing.'}
 
-# authorize keptn cli
-keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL"
-if [ $? -ne 0 ]; then
-    echo "Aborting: Failed to authenticate Keptn CLI"
-    exit 1
-fi
+# suppress message workaround - https://github.com/keptn/keptn/issues/4553
+bash -c "mkdir -p /root/.kube && touch /root/.kube/config"
+bash -c "ls -l /root/.kube"
 
 echo ""
 echo "================================================================="
