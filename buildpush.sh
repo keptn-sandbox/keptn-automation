@@ -1,9 +1,8 @@
 #!/bin/bash
 
-image=$1              # e.g. dtdemos/keptn-quality-gate-bash
-
 REPOSITORY=$1
 VERSION_TAG=$2
+
 IMAGE=keptn-automation
 
 if [ -z "$REPOSITORY" ]
@@ -13,7 +12,7 @@ fi
 
 if [ -z "$VERSION_TAG" ]
 then
-    VERSION_TAG=1
+    VERSION_TAG=$(head -1 version)
 fi
 
 FULLIMAGE=$REPOSITORY/$IMAGE:$VERSION_TAG
