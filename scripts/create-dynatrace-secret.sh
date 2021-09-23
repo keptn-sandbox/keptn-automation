@@ -17,6 +17,9 @@ echo "DT_BASE_URL    = $DT_BASE_URL"
 echo "DEBUG          = $DEBUG"
 echo "================================================================="
 
+echo "Calling keptn set config kubeContextCheck false"
+keptn set config kubeContextCheck false
+
 echo "Authorizing keptn cli"
 keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL"
 if [ $? -ne 0 ]; then
@@ -31,11 +34,16 @@ keptn delete secret dynatrace
 echo "-----------------------------------------------------------------"
 echo "keptn create secret"
 keptn_cmd=$(echo keptn create secret dynatrace --from-literal=\""DT_TENANT="$DT_BASE_URL"\" --from-literal=\"KEPTN_API_TOKEN="$KEPTN_API_TOKEN"\" --from-literal=\"KEPTN_API_URL="$KEPTN_BASE_URL"/api\" --from-literal=\"KEPTN_BRIDGE_URL="$KEPTN_BASE_URL"/bridge\" --from-literal=\"DT_API_TOKEN="$DT_API_TOKEN""\")
-if [[ "${DEBUG}" == "true" ]]; then
-    echo "keptn keptn create secret command:"
-    echo $keptn_cmd
-fi
 bash -c "$keptn_cmd"
+
+# truncate the tokens for debuging
+KEPTN_API_TOKEN_DEBUG=...${KEPTN_API_TOKEN: -7}
+DT_API_TOKEN_DEBUG=...${DT_API_TOKEN: -7}
+debug_keptn_cmd=$(echo keptn create secret dynatrace --from-literal=\""DT_TENANT="$DT_BASE_URL"\" --from-literal=\"KEPTN_API_TOKEN="$KEPTN_API_TOKEN_DEBUG"\" --from-literal=\"KEPTN_API_URL="$KEPTN_BASE_URL"/api\" --from-literal=\"KEPTN_BRIDGE_URL="$KEPTN_BASE_URL"/bridge\" --from-literal=\"DT_API_TOKEN="$DT_API_TOKEN_DEBUG""\")
+if [[ "${DEBUG}" == "true" ]]; then
+    echo "keptn create secret command:"
+    echo $debug_keptn_cmd
+fi
 
 echo "================================================================="
 echo "Create Dynatrace Secret"

@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# these functions assume the environment variables were set
+
+#########################################################################
+# keptn related tests
+#########################################################################
+
+keptn() {
+
+    echo "================================================================="
+    echo "Test keptn - $KEPTN_COMMAND"
+    echo "================================================================="
+
+    docker run -it --rm \
+        --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+        --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+        --env DEBUG=$DEBUG \
+        --env MOUNT=$MOUNT_PATH \
+        -v $LOCAL_TEST_FILES_PATH:$MOUNT_PATH/ \
+        $IMAGE \
+        "keptn.sh $KEPTN_COMMAND"
+}
+
+test_get_project() {
+    export KEPTN_COMMAND="get project"
+    keptn
+}
+
+test_delete_project() {
+    export KEPTN_COMMAND="delete project $KEPTN_PROJECT"
+    keptn
+}
+
+test_create_project() {
+    export KEPTN_COMMAND="create project $KEPTN_PROJECT --shipyard=$KEPTN_SHIPYARD_FILE"
+    keptn
+}
+
+test_update_project_with_upstream() {
+    export KEPTN_COMMAND="update project $KEPTN_PROJECT --git-user=$GIT_USER --git-token=$GIT_TOKEN --git-remote-url=$GIT_REMOTE_URL"
+    keptn
+}
+
+test_configure_dynatrace_monitoring_for_project() {
+    export KEPTN_COMMAND="configure monitoring dynatrace --project=$KEPTN_PROJECT"
+    keptn
+}
+
+test_create_service() {
+    export KEPTN_COMMAND="create service $KEPTN_SERVICE --project=$KEPTN_PROJECT"
+    keptn
+}
+
+test_configure_service_with_dynatrace_query() {
+    export KEPTN_COMMAND="add-resource --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE --resource=$DT_CONF_QUERY_FILE --resourceUri=dynatrace/dynatrace.conf.yaml"
+    keptn
+}
+
+test_configure_service_with_dynatrace_slo_file() {
+    export KEPTN_COMMAND="add-resource --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE --resource=$DT_CONF_SLO_FILE --resourceUri=dynatrace/dynatrace.conf.yaml"
+    keptn
+    export KEPTN_COMMAND="add-resource --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE --resource=$KEPTN_SLO_FILE --resourceUri=slo.yaml"
+    keptn
+    export KEPTN_COMMAND="add-resource --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE --resource=$DT_SLI_FILE --resourceUri=dynatrace/sli.yaml"
+    keptn
+}
+
+#########################################################################
+# create_dynatrace_secret related tests
+#########################################################################
+
+test_create_dynatrace_secret() {
+
+    echo "================================================================="
+    echo "Test CREATE_DT_SECRET"
+    echo "================================================================="
+
+    docker run -it --rm \
+        --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+        --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+        --env DT_BASE_URL=$DT_BASE_URL \
+        --env DT_API_TOKEN=$DT_API_TOKEN \
+        --env DEBUG=$DEBUG \
+        $IMAGE \
+        create-dynatrace-secret.sh
+}
+
+#########################################################################
+# slo_evaluation related tests
+#########################################################################
+
+test_slo_evaluation() {
+
+    echo "================================================================="
+    echo "Test SLO evaluation"
+    echo "================================================================="
+
+    docker run -it --rm \
+        --env EVALUATION_RULE=$EVALUATION_RULE \
+        --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+        --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+        --env KEPTN_PROJECT=$KEPTN_PROJECT \
+        --env KEPTN_SERVICE=$KEPTN_SERVICE \
+        --env KEPTN_STAGE=$KEPTN_STAGE \
+        --env SOURCE=$SOURCE \
+        --env LABELS=$LABELS \
+        --env START=$START \
+        --env END=$END \
+        --env TIMEFRAME=$TIMEFRAME \
+        --env DEBUG=$DEBUG \
+        $IMAGE \
+        slo-evaluation.sh
+}

@@ -7,7 +7,7 @@
   },
   "id": "bc420ecf-fcd5-4ea6-8261-e20d8574de60",
   "dashboardMetadata": {
-    "name": "KQG;project=dt-orders;service=catalog;stage=dev",
+    "name": "KQG;project=dt-orders;service=catalog;stage=staging",
     "shared": false,
     "owner": "rob.jahn@dynatrace.com"
   },
@@ -63,7 +63,7 @@
             "AUTO_TAGS": [
               "service:catalog",
               "project:dt-orders",
-              "stage:dev"
+              "stage:staging"
             ]
           }
         }
@@ -107,7 +107,7 @@
             "AUTO_TAGS": [
               "service:catalog",
               "project:dt-orders",
-              "stage:dev"
+              "stage:staging"
             ]
           }
         }
@@ -151,7 +151,7 @@
             "AUTO_TAGS": [
               "service:catalog",
               "project:dt-orders",
-              "stage:dev"
+              "stage:staging"
             ]
           }
         }
@@ -220,7 +220,7 @@
             "AUTO_TAGS": [
               "service:catalog",
               "project:dt-orders",
-              "stage:dev"
+              "stage:staging"
             ]
           }
         }
@@ -263,7 +263,7 @@
             "AUTO_TAGS": [
               "service:catalog",
               "project:dt-orders",
-              "stage:dev"
+              "stage:staging"
             ]
           }
         }
@@ -306,7 +306,7 @@
             "AUTO_TAGS": [
               "service:catalog",
               "project:dt-orders",
-              "stage:dev"
+              "stage:staging"
             ]
           }
         }

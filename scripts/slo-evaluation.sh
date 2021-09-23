@@ -21,17 +21,11 @@ KEPTN_PROJECT=${KEPTN_PROJECT:?'KEPTN_PROJECT envionmment variable missing.'}
 KEPTN_SERVICE=${KEPTN_SERVICE:?'KEPTN_SERVICE envionmment variable missing.'}
 KEPTN_STAGE=${KEPTN_STAGE:?'KEPTN_STAGE envionmment variable missing.'}
 
-# default the bridge URL if not provided
-if [ -z "$KEPTN_BRIDGE_URL" ]; then
-  KEPTN_BRIDGE_URL=$KEPTN_BASE_URL
-fi
-
 echo "================================================================="
 echo "Keptn SLO Evaluation:"
 echo ""
 echo "EVALUATION_RULE   = $EVALUATION_RULE"
 echo "KEPTN_BASE_URL    = $KEPTN_BASE_URL"
-echo "KEPTN_BRIDGE_URL  = $KEPTN_BRIDGE_URL"
 echo "KEPTN_PROJECT     = $KEPTN_PROJECT"
 echo "KEPTN_SERVICE     = $KEPTN_SERVICE"
 echo "KEPTN_STAGE       = $KEPTN_STAGE"
@@ -45,6 +39,14 @@ echo "WAIT_LOOPS        = $WAIT_LOOPS"
 echo "DEBUG             = $DEBUG"
 echo "================================================================="
 
+echo "Calling keptn set config kubeContextCheck false"
+keptn set config kubeContextCheck false
+
+#echo "================================================================="
+#echo "Calling keptn set config kubeContextCheck false - second time"
+#keptn set config kubeContextCheck false
+
+echo "================================================================="
 echo "Authorizing keptn cli"
 keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL"
 if [ $? -ne 0 ]; then
@@ -127,7 +129,7 @@ echo "Evaluation Result = ${status}"
 echo "Evaluation Score  = ${score}"
 echo "================================================================="
 echo "For details visit the Keptn Bridge:"
-echo "$KEPTN_BRIDGE_URL/bridge/trace/$KEPTN_CONTEXT_ID"
+echo "$KEPTN_BASE_URL/bridge/trace/$KEPTN_CONTEXT_ID"
 echo "================================================================="
 
 # determine if process the result

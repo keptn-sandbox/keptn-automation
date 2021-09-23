@@ -1,6 +1,6 @@
 # Overview
 
-Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.8.x/quality_gates/get_started/)
+Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.9.x/quality_gates/get_started/)
 
 ##Use Cases:**
 * Add this following a performance test to automate results analysis
@@ -23,18 +23,37 @@ Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.8.x/q
 
 | Variable | Description | Required | Default |
 | -------- | ----------- | ---------| ------- |
-| KEPTN_BASE_URL | Keptn Tenant URL  | **Yes** | |
+| KEPTN_BASE_URL | Keptn base URL  | **Yes** | |
 | KEPTN_API_TOKEN | Keptn API Token  | **Yes** | |
-| KEPTN_BRIDGE_URL | Keptn Bridge URL  | | value of `KEPTN_BASE_URL` variable |
 | KEPTN_PROJECT | Keptn Project Name | **Yes** | |
 | KEPTN_SERVICE | Keptn Service Name | **Yes** | |
 | KEPTN_STAGE | Keptn Stage Name | **Yes** | |
-| EVALUATION_RULE | Must be value of `ignore`, `pass_on_warning`, or `fail_on_warning` | **Yes** | ignore |
-| TEST_STRATEGY | Custom metadata field | **Yes** | detached |
-| WAIT_LOOPS | Number of waiting loops for the evaluation to complete| **Yes** | 20 |
-| SOURCE | Custom metadata field | **Yes** | unknown |
-| START | Evaluation Start Time in format of 2021-06-09T21:00:00 | |
-| LABELS | Custom metadata data in format of a comma separated list - example `buildId=1,executedBy=manual​` | |
-| END | Evaluation End Time in format of 2021-06-09T21:00:00. Required if specify `START` variable. | Depends | |
+| EVALUATION_RULE | Must be value of `ignore`, `pass_on_warning`, or `fail_on_warning` | | ignore |
+| TEST_STRATEGY | Custom metadata field | | detached |
+| WAIT_LOOPS | Number of waiting loops for the evaluation to complete| | 20 |
+| SOURCE | Custom metadata field to describe to source of the request | | unknown |
 | TIMEFRAME | Evaluation time frame. Start time is now unless `START` variable. | | 5m |
+| LABELS | Custom metadata data in format of a comma separated list - example `buildId=1,executedBy=manual​` | |
+| START | Evaluation Start Time in format of 2021-06-09T21:00:00 | |
+| END | Evaluation End Time in format of 2021-06-09T21:00:00. Required if specify `START` variable. | Depends | |
 | DEBUG | Set to `true` or `false` | | false |
+
+## Usage Examples
+
+Below is the basic usage using a Docker example. Any inputs are specified as environment variables as shown below with the script to invoke. 
+
+```
+docker run -it --rm \
+    --env EVALUATION_RULE="pass_on_warning" \
+    --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+    --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+    --env KEPTN_PROJECT=$KEPTN_PROJECT \
+    --env KEPTN_SERVICE=$KEPTN_SERVICE \
+    --env KEPTN_STAGE=$KEPTN_STAGE \
+    $IMAGE \
+    slo-evaluation.sh
+```
+
+## More Examples
+
+See the [test/test-library.lib](test/test-library.lib) file more examples. 
