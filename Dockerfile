@@ -7,7 +7,7 @@ RUN apk --no-cache add \
 RUN apk add curl
 
 # Install Keptn CLI **********************************
-ARG KEPTN_VERSION="0.8.3"
+ARG KEPTN_VERSION="0.9.1"
 
 RUN curl -LO https://github.com/keptn/keptn/releases/download/${KEPTN_VERSION}/keptn-${KEPTN_VERSION}-linux-amd64.tar.gz
 RUN tar -xvf keptn-${KEPTN_VERSION}-linux-amd64.tar.gz
