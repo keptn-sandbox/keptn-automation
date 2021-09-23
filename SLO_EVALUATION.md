@@ -2,7 +2,8 @@
 
 Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.9.x/quality_gates/get_started/)
 
-##Use Cases:**
+## Use Cases
+
 * Add this following a performance test to automate results analysis
 * Add this to code pipeline as a `quality gate` prior to deploying to another environment
 * Add this to following the performance test of individual services as a prerequisite quality gate to integrated tests
