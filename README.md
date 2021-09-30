@@ -7,14 +7,15 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
 | Keptn Supported Version | Container Image Tag            | Comment |
 | ----------------------- | -------------------            | --------|
 | 0.9.1                   | dtdemos/keptn-automation:0.1.0 | Initial version |
+| 0.9.2                   | dtdemos/keptn-automation:0.1.1 | Update to 0.9.2 Keptn CLI |
 
 # Usage 
 
 ## Supported Use cases
 
-* [Execute any Keptn CLI command such as those needed to onboard a service](KEPTN.md)
-* [Create Dynatrace Service secret](CREATE_DYNATRACE_SECRET.md)
-* [Perform SLO Evaluation as a "Quality Gate"](SLO_EVALUATION.md)
+1. [Execute ANY Keptn CLI command such as those needed to onboard a service](KEPTN.md)
+1. [Create Dynatrace Service secret](CREATE_DYNATRACE_SECRET.md)
+1. [Perform SLO Evaluation as a "Quality Gate"](SLO_EVALUATION.md)
 
 ## Usage Prerequisites
 
