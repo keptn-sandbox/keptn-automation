@@ -9,7 +9,7 @@ source test-library.lib
 export KEPTN_BASE_URL=      # for example https://XXXXX.cloudautomation.live.dynatrace.com
 export KEPTN_API_TOKEN=     # <ADD YOUR TOKEN>
 
-export IMAGE=dtdemos/keptn-automation:0.1.0
+export IMAGE=dtdemos/keptn-automation:0.2.0
 
 # these variables only needed for 'create-dynatrace-secret' use case
 export DT_BASE_URL=         # for example https://XXXXX.live.dynatrace.com
