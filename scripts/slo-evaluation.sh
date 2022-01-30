@@ -46,8 +46,9 @@ keptn set config kubeContextCheck false
 #echo "Calling keptn set config kubeContextCheck false - second time"
 #keptn set config kubeContextCheck false
 
-echo "================================================================="
-echo "Authorizing keptn cli"
+echo "-----------------------------------------------------------------"
+echo "Authorizing keptn cli with 'keptn auth'"
+echo "-----------------------------------------------------------------"
 keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL"
 if [ $? -ne 0 ]; then
     echo "Aborting: Failed to authenticate Keptn CLI"
@@ -55,8 +56,16 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "-----------------------------------------------------------------"
-echo "Sending start Keptn Evaluation"
+echo "Running 'keptn set config AutomaticVersionCheck false'"
+echo "-----------------------------------------------------------------"
+keptn set config AutomaticVersionCheck false
+
+
 KEPTN_CMD="keptn trigger evaluation --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE"
+echo "-----------------------------------------------------------------"
+echo "Sending start Keptn Evaluation"
+echo "$KEPTN_CMD"
+echo "-----------------------------------------------------------------"
 # if passed in start then add that, else just use timeframe
 if [ -n "$TIMEFRAME" ]; then
   if [ -n "$START" ]; then
