@@ -9,6 +9,7 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
 | 0.9.1                   | dtdemos/keptn-automation:0.1.0 | Initial version |
 | 0.9.2                   | dtdemos/keptn-automation:0.1.1 | Update to 0.9.2 Keptn CLI |
 | 0.10.0                  | dtdemos/keptn-automation:0.2.0 | Update to 0.10.0 Keptn CLI |
+| 0.12.0                  | dtdemos/keptn-automation:0.4.0 | Update to 0.12.0 Keptn CLI |
 
 # Usage 
 
