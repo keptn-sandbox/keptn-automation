@@ -8,6 +8,7 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
 | ----------------------- | -------------------            | --------|
 | 0.9.1                   | dtdemos/keptn-automation:0.1.0 | Initial version |
 | 0.9.2                   | dtdemos/keptn-automation:0.1.1 | Update to 0.9.2 Keptn CLI |
+| 0.10.0                  | dtdemos/keptn-automation:0.2.0 | Update to 0.10.0 Keptn CLI |
 
 # Usage 
 
@@ -31,9 +32,32 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
 
 ## Build new versions
 
-* Update the `version` file and readme compatibility grid
-* Update docker for new version of the Keptn CLI
-* Use the `buildpush.sh` script to build and push the built image.  This script reads the `version` file for the tag label
+* Update the `version` file and readme compatibility grid using [Semantic Versioning](https://semver.org/)
+    * New MAJOR version for Keptn CLI or scripts that are breaking changes 
+    * New MINOR version for new versions of Keptn CLI or scripts that are backwards compatible manner
+    * New PATCH version for patch fixes to Keptn CLI or scripts that are backwards compatible manner
+* Update `Dockerfile` for new version of the Keptn CLI
+* Use the `buildpush.sh` script to build and push the build Docker image.  NOTE: This script reads the `version` file for the Docker image tag label
+* Once finalized add a Git Tag for the new version using the guide below as reference
+
+    ```
+    # list tags with descriptions
+    git tag -n
+
+    # add new tag
+    git tag -a [tagname] -m [description]
+    git push origin [tagname]
+    
+    # add new tag example:
+    git tag -a "release-0.2.0" -m "Update to keptn 0.10.0"
+    git push origin release-0.2.0
+
+    # to checkout a tag
+    git checkout [tagname]
+
+    # to checkout main branch
+    git checkout main
+    ```
 
 ## Test locally
 
