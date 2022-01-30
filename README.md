@@ -57,7 +57,7 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
     git checkout [tagname]
 
     # to checkout main branch
-    git checkout main
+    git checkout master
     ```
 
 ## Test locally
