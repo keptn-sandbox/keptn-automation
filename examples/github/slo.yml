@@ -1,0 +1,43 @@
+# requires the following secrets:
+# KEPTN_BASE_URL
+# KEPTN_API_TOKEN 
+
+name: SLO Evaluation
+on:
+  workflow_dispatch:
+  #schedule:
+  #  - cron:  '*/5 * * * *'
+      
+env:
+  EVALUATION_RULE: ignore #ignore, pass_on_warning, fail_on_warning
+  KEPTN_PROJECT: demo-github
+  KEPTN_SERVICE: tnt-demo-svc
+  KEPTN_STAGE: production
+  LABELS: "runId=${{ github.run_id }},executedBy=GitHub,Job=https://github.com/MYORG/MYREPO/actions/runs/${{ github.run_id }}"            
+  #START: "2021-06-09T21:00:00"
+  #END: "2021-06-09T22:00:00"
+  TIMEFRAME: 5m
+  DEBUG: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: dtdemos/keptn-automation:0.4.0
+      env:
+        EVALUATION_RULE: ${{ env.EVALUATION_RULE }}
+        KEPTN_BASE_URL: ${{ secrets.KEPTN_BASE_URL }}
+        KEPTN_API_TOKEN: ${{ secrets.KEPTN_API_TOKEN }}
+        KEPTN_PROJECT: ${{ env.KEPTN_PROJECT }}
+        KEPTN_SERVICE: ${{ env.KEPTN_SERVICE }}
+        KEPTN_STAGE: ${{ env.KEPTN_STAGE }}
+        SOURCE: ${{ env.SOURCE }}
+        LABELS: ${{ env.LABELS }}
+        START: ${{ env.START }}
+        END: ${{ env.END }}
+        TIMEFRAME: ${{ env.TIMEFRAME }}
+        DEBUG: ${{ env.DEBUG }}
+
+    steps:
+      - name: SLO Evaluation
+        run: slo-evaluation.sh

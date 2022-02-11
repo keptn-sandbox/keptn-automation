@@ -1,0 +1,50 @@
+# keptnCred is a generic Jfrog integration with two environment variables
+# BASE_URL = keptn/cloud automation URL (http://xxx.com)
+# API_TOKEN = keptn/cloud automation API token
+# gitRepo is only needed if you want to trigger on commits
+
+resources:
+  - name: gitRepo   
+    type: GitRepo
+    configuration:
+      gitProvider: GitHub                      
+      path: MYORG/MYREPO  
+      branches:
+        include: master  
+      buildOn:
+        commit: true
+
+pipelines:
+  - name: slo_pipeline
+    configuration:
+      environmentVariables:
+        readOnly:
+          KEPTN_PROJECT: "jfrog-demo"
+          KEPTN_SERVICE: "tnt-demo-svc"
+          KEPTN_STAGE: "production"
+          KEPTN_AUTOMATION_IMAGE: "dtdemos/keptn-automation:0.2.1"
+
+    steps:
+    - name: slo_quality_gate
+      type: Bash
+      configuration:
+        affinityGroup: slo_quality_gate
+        integrations:
+          - name: keptnCred
+        inputResources:
+            - name: gitRepo
+      execution:
+        onExecute:
+          - LABELS="JfrogRunId=$run_id,executedBy=Jfrog,Jfrog=$step_url"
+          - EVALUATION_RULE="ignore"
+          - |
+            docker run  \
+                --env EVALUATION_RULE=$EVALUATION_RULE \
+                --env KEPTN_BASE_URL=$int_keptnCred_BASE_URL \
+                --env KEPTN_API_TOKEN=$int_keptnCred_API_TOKEN \
+                --env KEPTN_PROJECT=$KEPTN_PROJECT \
+                --env KEPTN_SERVICE=$KEPTN_SERVICE \
+                --env KEPTN_STAGE=$KEPTN_STAGE \
+                --env LABELS=$LABELS \
+                $KEPTN_AUTOMATION_IMAGE \
+                slo-evaluation.sh
