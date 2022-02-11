@@ -19,6 +19,20 @@ Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.9.x/q
     * If the Keptn status = `ignore`, then always return zero
     * If the Keptn status = `pass_on_warning`, then - return zero unless keptn status equals fail
     * If the Keptn status = `fail_on_warning`, then - return zero unless keptn status equals fail or warn
+1. Standard output returned is JSON in this format:
+
+    ```
+    {
+        "evaluationRule":"ignore",
+        "evaluationResult":"warning",
+        "evaluationScore":"85.71428571428571",
+        "bridge":"https://rob00334.cloudautomation.live.dynatrace.com/bridge/trace/8a9fa6c2-ae1d-4002-acf5-14f0680c4852",
+        "exitStatus":"Ignoring Evaluation Logic",
+        "evaluationResults": { ... full output from SLO evaluation }
+    }
+    ```
+
+1. If the DEBUG is set to `true` then the standard output first returns debug messages followed by the JSON results.
 
 ## environment variables
 

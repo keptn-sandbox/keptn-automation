@@ -21,51 +21,64 @@ KEPTN_PROJECT=${KEPTN_PROJECT:?'KEPTN_PROJECT envionmment variable missing.'}
 KEPTN_SERVICE=${KEPTN_SERVICE:?'KEPTN_SERVICE envionmment variable missing.'}
 KEPTN_STAGE=${KEPTN_STAGE:?'KEPTN_STAGE envionmment variable missing.'}
 
-echo "================================================================="
-echo "Keptn SLO Evaluation:"
-echo ""
-echo "EVALUATION_RULE   = $EVALUATION_RULE"
-echo "KEPTN_BASE_URL    = $KEPTN_BASE_URL"
-echo "KEPTN_PROJECT     = $KEPTN_PROJECT"
-echo "KEPTN_SERVICE     = $KEPTN_SERVICE"
-echo "KEPTN_STAGE       = $KEPTN_STAGE"
-echo "START             = $START"
-echo "END               = $END"
-echo "TIMEFRAME         = $TIMEFRAME"
-echo "LABELS            = $LABELS"
-echo "SOURCE            = $SOURCE"
-echo "TEST_STRATEGY     = $TEST_STRATEGY"
-echo "WAIT_LOOPS        = $WAIT_LOOPS"
-echo "DEBUG             = $DEBUG"
-echo "================================================================="
+if [[ "${DEBUG}" == "true" ]]; then
+  echo "================================================================="
+  echo "Keptn SLO Evaluation:"
+  echo ""
+  echo "EVALUATION_RULE   = $EVALUATION_RULE"
+  echo "KEPTN_BASE_URL    = $KEPTN_BASE_URL"
+  echo "KEPTN_PROJECT     = $KEPTN_PROJECT"
+  echo "KEPTN_SERVICE     = $KEPTN_SERVICE"
+  echo "KEPTN_STAGE       = $KEPTN_STAGE"
+  echo "START             = $START"
+  echo "END               = $END"
+  echo "TIMEFRAME         = $TIMEFRAME"
+  echo "LABELS            = $LABELS"
+  echo "SOURCE            = $SOURCE"
+  echo "TEST_STRATEGY     = $TEST_STRATEGY"
+  echo "WAIT_LOOPS        = $WAIT_LOOPS"
+  echo "DEBUG             = $DEBUG"
+  echo "================================================================="
+fi
 
-echo "Calling keptn set config kubeContextCheck false"
-keptn set config kubeContextCheck false
+if [[ "${DEBUG}" == "true" ]]; then
+  echo "Calling keptn set config kubeContextCheck false"
+  keptn set config kubeContextCheck false
+else
+  keptn set config kubeContextCheck false > /dev/null 2>&1 
+fi
 
-#echo "================================================================="
-#echo "Calling keptn set config kubeContextCheck false - second time"
-#keptn set config kubeContextCheck false
-
-echo "-----------------------------------------------------------------"
-echo "Authorizing keptn cli with 'keptn auth'"
-echo "-----------------------------------------------------------------"
-keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL"
+if [[ "${DEBUG}" == "true" ]]; then
+  echo "-----------------------------------------------------------------"
+  echo "Authorizing keptn cli with 'keptn auth'"
+  echo "-----------------------------------------------------------------"
+  keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL"
+else
+  keptn auth --api-token "$KEPTN_API_TOKEN" --endpoint "$KEPTN_BASE_URL" > /dev/null 2>&1 
+fi
 if [ $? -ne 0 ]; then
     echo "Aborting: Failed to authenticate Keptn CLI"
     exit 1
 fi
 
-echo "-----------------------------------------------------------------"
-echo "Running 'keptn set config AutomaticVersionCheck false'"
-echo "-----------------------------------------------------------------"
-keptn set config AutomaticVersionCheck false
-
+if [[ "${DEBUG}" == "true" ]]; then
+  echo "-----------------------------------------------------------------"
+  echo "Running 'keptn set config AutomaticVersionCheck false'"
+  echo "-----------------------------------------------------------------"
+  keptn set config AutomaticVersionCheck false
+else
+  keptn set config AutomaticVersionCheck false > /dev/null 2>&1 
+fi
 
 KEPTN_CMD="keptn trigger evaluation --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE"
-echo "-----------------------------------------------------------------"
-echo "Sending start Keptn Evaluation"
-echo "$KEPTN_CMD"
-echo "-----------------------------------------------------------------"
+if [[ "${DEBUG}" == "true" ]]; then
+  echo "-----------------------------------------------------------------"
+  echo "Sending start Keptn Evaluation"
+  echo "$KEPTN_CMD"
+  echo "-----------------------------------------------------------------"
+fi
+
+
 # if passed in start then add that, else just use timeframe
 if [ -n "$TIMEFRAME" ]; then
   if [ -n "$START" ]; then
@@ -100,27 +113,30 @@ if [ -z "${KEPTN_CONTEXT_ID}" ]; then
   echo "Aborting: Keptn Context ID not returned with the keptn response of:"
   echo $POST_RESPONSE
   exit 1
-else
+fi
+if [[ "${DEBUG}" == "true" ]]; then
   echo ""
   echo "Keptn Context ID:"
   echo "$KEPTN_CONTEXT_ID"
   echo ""
+  echo "-----------------------------------------------------------------"
 fi
 
-echo "-----------------------------------------------------------------"
 i=1
 while [ $i -lt $WAIT_LOOPS ]
 do
-    echo "Waiting for evaluation results (attempt $i of $WAIT_LOOPS)..."
+    if [[ "${DEBUG}" == "true" ]]; then
+      echo "Waiting for evaluation results (attempt $i of $WAIT_LOOPS)..."
+    fi
     result=$(curl -s -k -X GET "${KEPTN_BASE_URL}/api/mongodb-datastore/event?keptnContext=${KEPTN_CONTEXT_ID}&type=sh.keptn.event.evaluation.finished" -H "accept: application/json" -H "x-token: ${KEPTN_API_TOKEN}")
     if [[ "${DEBUG}" == "true" ]]; then
       echo "Response from API: "
       echo $result | jq .
     fi
-    status=$(echo $result|jq -r ".events[0].data.evaluation.result")
-    score=$(echo $result|jq -r ".events[0].data.evaluation.score")
+    STATUS=$(echo $result|jq -r ".events[0].data.evaluation.result")
+    SCORE=$(echo $result|jq -r ".events[0].data.evaluation.score")
 
-    if [ "$status" = "null" ]; then
+    if [ "$STATUS" = "null" ]; then
       i=`expr $i + 1`
       sleep 10
     else
@@ -128,35 +144,41 @@ do
     fi
 done
 
-filename=evaluation-result.json
-echo "Writing results to file $filename."
+filename=/slo_result/slo-evaluation-result.json
+if [[ "${DEBUG}" == "true" ]]; then
+  echo "Writing results to file $filename."
+fi
 echo $result|jq > $filename
 
-echo "================================================================="
-echo "Evaluation Rule   = $EVALUATION_RULE"
-echo "Evaluation Result = ${status}"
-echo "Evaluation Score  = ${score}"
-echo "================================================================="
-echo "For details visit the Keptn Bridge:"
-echo "$KEPTN_BASE_URL/bridge/trace/$KEPTN_CONTEXT_ID"
-echo "================================================================="
+echo "{"
+echo '"evaluationRule":"'$EVALUATION_RULE'",'
+echo '"evaluationResult":"'$STATUS'",'
+echo '"evaluationScore":"'$SCORE'",'
+echo '"bridge":"'$KEPTN_BASE_URL'/bridge/trace/'$KEPTN_CONTEXT_ID'",'
 
 # determine if process the result
 if [ "${EVALUATION_RULE}" != "pass_on_warning" ] && [ "${EVALUATION_RULE}" != "fail_on_warning" ]; then
-  echo "Ignoring Evaluation Logic"
-  exit
+  echo '"exitStatus":"Ignoring Evaluation Logic",'
+  exitStatus=0
+else
+  if [ "$status" = "pass" ]; then
+    echo "Evaluation PASSED"
+  elif [ "$status" = "warning" ]; then
+    if [ "${EVALUATION_RULE}" == "fail_on_warning" ]; then
+      echo '"exitStatus":"Evaluation FAILED on warning",'
+      exitStatus=1
+    else
+      echo '"exitStatus":"Evaluation PASSED with warning",'
+      exitStatus=0
+    fi
+  else
+    echo '"exitStatus":"Evaluation FAILED",'
+    exitStatus=1
+  fi
 fi
 
-if [ "$status" = "pass" ]; then
-  echo "Evaluation PASSED"
-elif [ "$status" = "warning" ]; then
-  if [ "${EVALUATION_RULE}" == "fail_on_warning" ]; then
-    echo "Evaluation FAILED on warning"
-    exit 1
-  else
-    echo "Evaluation PASSED with warning"
-  fi
-else
-  echo "Evaluation FAILED"
-  exit 1
-fi
+echo '"evaluationResults":'
+echo $result|jq
+echo "}"
+
+exit $exitStatus
