@@ -1,0 +1,37 @@
+# setup the following a pipeline variable with the token set as a secret
+# BASE_URL = keptn/cloud automation URL (http://xxx.com)
+# API_TOKEN = keptn/cloud automation API token
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+trigger: none
+
+variables:
+  KEPTN_PROJECT: "demo-github"
+  KEPTN_SERVICE: "tnt-demo-svc"
+  KEPTN_STAGE: "production"
+  EVALUATION_RULE: "ignore"
+  LABELS: "AzureDevopsId=$(Build.BuildNumber),executedBy=AzureDevops,AzureDevops=$(System.TeamFoundationCollectionUri)/$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
+    
+steps:
+- script: |
+    docker run  \
+        --env KEPTN_BASE_URL=$(KEPTN_BASE_URL) \
+        --env KEPTN_API_TOKEN=$(KEPTN_API_TOKEN) \
+        dtdemos/keptn-automation:0.2.1 \
+        "keptn.sh get project"
+  displayName: 'get projects'
+
+- script: |
+    docker run  \
+        --env EVALUATION_RULE=$(EVALUATION_RULE) \
+        --env KEPTN_BASE_URL=$(KEPTN_BASE_URL) \
+        --env KEPTN_API_TOKEN=$(KEPTN_API_TOKEN) \
+        --env KEPTN_PROJECT=$(KEPTN_PROJECT) \
+        --env KEPTN_SERVICE=$(KEPTN_SERVICE) \
+        --env KEPTN_STAGE=$(KEPTN_STAGE) \
+        --env LABELS=$(LABELS) \
+        dtdemos/keptn-automation:0.2.1 \
+        slo-evaluation.sh
+  displayName: 'SLO evaluation'
