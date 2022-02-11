@@ -112,3 +112,27 @@ test_slo_evaluation() {
         $IMAGE \
         slo-evaluation.sh
 }
+
+test_slo_evaluation_with_mount() {
+
+    echo "================================================================="
+    echo "Test SLO evaluation with Mount"
+    echo "================================================================="
+
+    docker run -it --rm \
+        --env EVALUATION_RULE=$EVALUATION_RULE \
+        --env KEPTN_BASE_URL=$KEPTN_BASE_URL \
+        --env KEPTN_API_TOKEN=$KEPTN_API_TOKEN \
+        --env KEPTN_PROJECT=$KEPTN_PROJECT \
+        --env KEPTN_SERVICE=$KEPTN_SERVICE \
+        --env KEPTN_STAGE=$KEPTN_STAGE \
+        --env SOURCE=$SOURCE \
+        --env LABELS=$LABELS \
+        --env START=$START \
+        --env END=$END \
+        --env TIMEFRAME=$TIMEFRAME \
+        --env DEBUG=$DEBUG \
+        -v $LOCAL_TEST_FILES_PATH:$MOUNT_PATH/ \
+        $IMAGE \
+        slo-evaluation.sh
+}
