@@ -2,16 +2,6 @@
 
 This repo contains scripts to create a container image with the [Keptn CLI](https://keptn.sh/docs/0.9.x/reference/cli/) binary and a set of Unix bash scripts to simplify the effort to integrate Keptn into software delivery pipelines. This design is aimed to approach simplifies maintenance. If there is a new version of the Keptn CLI, one can just update and rebuild the Docker container and the Unix bash scripts automate common logic.
 
-## Container Images
-
-| Keptn Supported Version | Container Image Tag            | Comment |
-| ----------------------- | -------------------            | --------|
-| 0.9.1                   | dtdemos/keptn-automation:0.1.0 | Initial version |
-| 0.9.2                   | dtdemos/keptn-automation:0.1.1 | Update to 0.9.2 Keptn CLI |
-| 0.10.0                  | dtdemos/keptn-automation:0.2.0 | Update to 0.10.0 Keptn CLI |
-| 0.10.0                  | dtdemos/keptn-automation:0.2.1 | Adjust SLO output to be JSON format |
-| 0.12.0                  | dtdemos/keptn-automation:0.4.0 | Update to 0.12.0 Keptn CLI |
-
 # Usage 
 
 ## Supported Use cases
@@ -28,7 +18,18 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
 
 ## Continuous Delivery pipeline examples
 
-See the `examples` folder in this repo for example pipeline scripts for various platforms.
+See the [examples](examples/) folder in this repo for example pipeline scripts for various platforms.
+
+## Container Images
+
+| Keptn Supported Version | Container Image Tag            | Comment |
+| ----------------------- | -------------------            | --------|
+| 0.9.1                   | dtdemos/keptn-automation:0.1.0 | Initial version |
+| 0.9.2                   | dtdemos/keptn-automation:0.1.1 | Update to 0.9.2 Keptn CLI |
+| 0.10.0                  | dtdemos/keptn-automation:0.2.0 | Update to 0.10.0 Keptn CLI |
+| 0.10.0                  | dtdemos/keptn-automation:0.2.1 | Adjust SLO output to be JSON format |
+| 0.12.0                  | dtdemos/keptn-automation:0.4.0 | Update to 0.12.0 Keptn CLI |
+| 0.12.6                  | dtdemos/keptn-automation:0.4.1 | Update to 0.12.6 Keptn CLI |
 
 # Development
 
