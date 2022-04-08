@@ -22,7 +22,7 @@ pipelines:
           KEPTN_PROJECT: "jfrog-demo"
           KEPTN_SERVICE: "tnt-demo-svc"
           KEPTN_STAGE: "production"
-          KEPTN_AUTOMATION_IMAGE: "dtdemos/keptn-automation:0.2.1"
+          KEPTN_AUTOMATION_IMAGE: "dtdemos/keptn-automation:0.4.1"
 
     steps:
     - name: slo_quality_gate

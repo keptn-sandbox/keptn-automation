@@ -23,7 +23,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: dtdemos/keptn-automation:0.4.0
+      image: dtdemos/keptn-automation:0.4.1
       env:
         EVALUATION_RULE: ${{ env.EVALUATION_RULE }}
         KEPTN_BASE_URL: ${{ secrets.KEPTN_BASE_URL }}
