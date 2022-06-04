@@ -1,6 +1,6 @@
 # Overview
 
-Use this action type to create Dynatrace secret with required credentials. [Keptn Docs](https://keptn.sh/docs/0.9.x/monitoring/dynatrace/install/#1-create-a-secret-with-required-credentials). 
+Use this action type to create Dynatrace secret with required credentials. [Keptn Docs](https://keptn.sh/docs/0.13.x/monitoring/dynatrace/install/#1-create-a-secret-with-required-credentials). 
 
 ## Script logic
 

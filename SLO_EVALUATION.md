@@ -1,6 +1,6 @@
 # Overview
 
-Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.9.x/quality_gates/get_started/)
+Use this action type to perform a [SLO evaluation](https://keptn.sh/docs/0.13.x/quality_gates/get_started/)
 
 ## Use Cases
 
