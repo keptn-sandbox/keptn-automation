@@ -144,12 +144,6 @@ do
     fi
 done
 
-#filename=/slo_result/slo-evaluation-result.json
-#if [[ "${DEBUG}" == "true" ]]; then
-#  echo "Writing results to file $filename."
-#fi
-#echo $result|jq > $filename
-
 echo "{"
 echo '"evaluationRule":"'$EVALUATION_RULE'",'
 echo '"evaluationResult":"'$STATUS'",'
