@@ -1,24 +1,28 @@
 # Overview
 
-This repo contains scripts to create a container image with the [Keptn CLI](https://keptn.sh/docs/0.9.x/reference/cli/) binary and a set of Unix bash scripts to simplify the effort to integrate Keptn into software delivery pipelines. This design is aimed to approach simplifies maintenance. If there is a new version of the Keptn CLI, one can just update and rebuild the Docker container and the Unix bash scripts automate common logic.
+This repo contains scripts to create a container image with the [Keptn CLI](https://keptn.sh/docs/0.13.x/reference/cli/) binary and a set of Unix bash scripts to simplify the effort to integrate Keptn into software delivery pipelines. This design is aimed to approach simplifies maintenance. If there is a new version of the Keptn CLI, one can just update and rebuild the Docker container and the Unix bash scripts automate common logic.
 
 # Usage 
 
 ## Supported Use cases
 
 1. [Execute ANY Keptn CLI command such as those needed to onboard a service](KEPTN.md)
-1. [Create Dynatrace Service secret](CREATE_DYNATRACE_SECRET.md)
 1. [Perform SLO Evaluation as a "Quality Gate"](SLO_EVALUATION.md)
+1. [Create Dynatrace Service secret](CREATE_DYNATRACE_SECRET.md)
+
+## Examples
+
+See the [examples](examples/) folder in this repo for example for various platforms.
+* Azure DevOps
+* GitHub
+* GitLab
+* JFrog pipelines
 
 ## Usage Prerequisites
 
 * [Keptn](https://keptn.sh/docs/quickstart/) with a [Dynatrace tenant](https://www.dynatrace.com/trial) or a [Dynatrace Cloud Automation Environment](https://www.dynatrace.com/support/help/how-to-use-dynatrace/cloud-automation/quality-gates/before-you-begin-with-quality-gates/) environment
 * Sample application with Dynatrace OneAgent monitoring
 * A pipeline tool that supports running a Docker image with a volume mount.  
-
-## Continuous Delivery pipeline examples
-
-See the [examples](examples/) folder in this repo for example pipeline scripts for various platforms.
 
 ## Container Images
 
@@ -30,6 +34,7 @@ See the [examples](examples/) folder in this repo for example pipeline scripts f
 | 0.10.0                  | dtdemos/keptn-automation:0.2.1 | Adjust SLO output to be JSON format |
 | 0.12.0                  | dtdemos/keptn-automation:0.4.0 | Update to 0.12.0 Keptn CLI |
 | 0.12.6                  | dtdemos/keptn-automation:0.4.1 | Update to 0.12.6 Keptn CLI |
+| 0.13.6                  | dtdemos/keptn-automation:0.5.0 | Update to 0.13.6 Keptn CLI |
 
 # Development
 
