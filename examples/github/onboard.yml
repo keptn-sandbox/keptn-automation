@@ -15,8 +15,8 @@ env:
   KEPTN_SERVICE: frontend
   KEPTN_STAGE: staging
   KEPTN_SHIPYARD_FILE: ./keptn/shipyard.yaml
-  KEPTN_SLO_FILE: ./keptn/slo.yaml
   CONFIGURE_DT_MONITORING: true
+  KEPTN_SLO_FILE: ./keptn/slo.yaml
   DT_CONF_FILE: ./keptn/dynatrace.conf.yaml
   DT_SLI_FILE: ./keptn/sli.yaml
   DEBUG: true
@@ -25,15 +25,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: dtdemos/keptn-automation:0.4.0
+      image: dtdemos/keptn-automation:0.5.0
       env:
         KEPTN_BASE_URL: ${{ secrets.KEPTN_BASE_URL }}
         KEPTN_API_TOKEN: ${{ secrets.KEPTN_API_TOKEN }}
-        KEPTN_SHIPYARD_FILE: ${{ env.KEPTN_SHIPYARD_FILE }}
-        KEPTN_PROJECT: ${{ env.KEPTN_PROJECT }}
-        KEPTN_SERVICE: ${{ env.KEPTN_SERVICE }}
-        KEPTN_STAGE: ${{ env.KEPTN_STAGE }}
-        DT_CONF_FILE: ${{ env.DT_CONF_FILE }}
         DT_BASE_URL: ${{ secrets.DT_BASE_URL }}
         DT_API_TOKEN: ${{ secrets.DT_API_TOKEN }}
         DEBUG: ${{ env.DEBUG }}
@@ -47,13 +42,13 @@ jobs:
         run: create-dynatrace-secret.sh
 
       - name: keptn onboardservice
-        run: keptn.sh create project $KEPTN_PROJECT --shipyard=$KEPTN_SHIPYARD_FILE
+        run: keptn.sh create project ${{ env.KEPTN_PROJECT }} --shipyard=${{ env.KEPTN_SHIPYARD_FILE }}
 
       - name: configure_dynatrace_monitoring_for_project
-        run: keptn.sh configure monitoring dynatrace --project=$KEPTN_PROJECT
+        run: keptn.sh configure monitoring dynatrace --project=${{ env.KEPTN_PROJECT }}
 
       - name: create_service
-        run: keptn.sh create service $KEPTN_SERVICE --project=$KEPTN_PROJECT
+        run: keptn.sh create service ${{ env.KEPTN_SERVICE }} --project=${{ env.KEPTN_PROJECT }}
 
       - name: configure_service_with_dynatrace_query
-        run: keptn.sh add-resource --project=$KEPTN_PROJECT --stage=$KEPTN_STAGE --service=$KEPTN_SERVICE --resource=$DT_CONF_FILE --resourceUri=dynatrace/dynatrace.conf.yaml
+        run: keptn.sh add-resource --project=${{ env.KEPTN_PROJECT }} --stage=${{ env.KEPTN_STAGE }} --service=${{ env.KEPTN_SERVICE }} --resource=${{ env.DT_CONF_FILE }} --resourceUri=dynatrace/dynatrace.conf.yaml

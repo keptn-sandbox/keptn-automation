@@ -2,7 +2,7 @@
 # KEPTN_BASE_URL
 # KEPTN_API_TOKEN 
 
-name: SLO Evaluation
+name: Keptn Automation
 on:
   workflow_dispatch:
   #schedule:
@@ -10,10 +10,10 @@ on:
       
 env:
   EVALUATION_RULE: ignore #ignore, pass_on_warning, fail_on_warning
-  KEPTN_PROJECT: demo-github
-  KEPTN_SERVICE: tnt-demo-svc
+  KEPTN_PROJECT: slo-demo
+  KEPTN_SERVICE: casdemoapp
   KEPTN_STAGE: production
-  LABELS: "runId=${{ github.run_id }},executedBy=GitHub,Job=https://github.com/MYORG/MYREPO/actions/runs/${{ github.run_id }}"            
+  LABELS: "runId=${{ github.run_id }},executedBy=GitHub,Job=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"            
   #START: "2021-06-09T21:00:00"
   #END: "2021-06-09T22:00:00"
   TIMEFRAME: 5m
@@ -23,7 +23,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: dtdemos/keptn-automation:0.4.1
+      image: dtdemos/keptn-automation:0.5.0
       env:
         EVALUATION_RULE: ${{ env.EVALUATION_RULE }}
         KEPTN_BASE_URL: ${{ secrets.KEPTN_BASE_URL }}
@@ -39,5 +39,31 @@ jobs:
         DEBUG: ${{ env.DEBUG }}
 
     steps:
+      - name: Keptn Commands
+        run: |
+          echo "-------------------------------------------------------"
+          echo "keptn version"
+          echo "-------------------------------------------------------"
+          keptn version
+          echo "-------------------------------------------------------"
+          echo "keptn auth"
+          echo "-------------------------------------------------------"
+          keptn auth -e ${{ secrets.KEPTN_BASE_URL }}/api -a ${{ secrets.KEPTN_API_TOKEN }}
+          echo "-------------------------------------------------------"
+          echo "keptn status"
+          echo "-------------------------------------------------------"
+          keptn status
+          echo "-------------------------------------------------------"
+          echo "keptn get projects"
+          echo "-------------------------------------------------------"
+          keptn get projects
+          echo "-------------------------------------------------------"
+          echo "keptn get services --project ${{ env.KEPTN_PROJECT }}"
+          echo "-------------------------------------------------------"
+          keptn get services --project ${{ env.KEPTN_PROJECT }}        
       - name: SLO Evaluation
-        run: slo-evaluation.sh
+        run: |
+          echo "-------------------------------------------------------"
+          echo "Running slo-evaluation.sh"
+          echo "-------------------------------------------------------"  
+          slo-evaluation.sh

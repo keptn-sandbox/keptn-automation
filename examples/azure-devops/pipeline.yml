@@ -19,7 +19,7 @@ steps:
     docker run  \
         --env KEPTN_BASE_URL=$(KEPTN_BASE_URL) \
         --env KEPTN_API_TOKEN=$(KEPTN_API_TOKEN) \
-        dtdemos/keptn-automation:0.4.1 \
+        dtdemos/keptn-automation:0.5.0 \
         "keptn.sh get project"
   displayName: 'get projects'
 
@@ -32,6 +32,6 @@ steps:
         --env KEPTN_SERVICE=$(KEPTN_SERVICE) \
         --env KEPTN_STAGE=$(KEPTN_STAGE) \
         --env LABELS=$(LABELS) \
-        dtdemos/keptn-automation:0.4.1 \
+        dtdemos/keptn-automation:0.5.0 \
         slo-evaluation.sh
   displayName: 'SLO evaluation'
