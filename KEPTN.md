@@ -1,11 +1,26 @@
 # Overview
 
-Use this action type to call the [Keptn CLI](https://keptn.sh/docs/0.9.x/reference/cli/).  The action requires that the Keptn URL and API token are provided. The arguments to `keptn.sh` are are the arguments as specified in the keptn CLI.
+The keptn automation Docker image contains the [Keptn CLI](https://keptn.sh/docs/0.13.x/reference/cli/). The Keptn CLI requires that the Keptn URL and API token are provided so there are two approaches.
 
-## Script logic
+# Option 1 - Use CLI directly
+
+Most commands require the cli to be authenticated, so the commands must be strung together as shown below.
+
+```
+docker run -it --rm dtdemos/keptn-automation:0.5.0 "keptn auth -e $KEPTN_BASE_URL/api -a $KEPTN_API_TOKEN && keptn status && keptn get projects"
+```
+
+Depending on the pipeline tool, the image can be opened and multiple command passed seperately.  See the `example/gitlab` folder for an example of this.
+
+# Option 2 - Use the keptn.sh script 
+
+A convenience script called `keptn.sh` will perform both the auth and the passed in keptn CLI command.
+
+## script logic
 
 1. call `keptn auth`
-1. run the keptn command provided such as `get project`
+1. call `keptn set config kubeContextCheck false`
+1. run the keptn command provided such as `keptn get project`
 
 ## Environment variables
 
