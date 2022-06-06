@@ -2,14 +2,12 @@
 # KEPTN_BASE_URL
 # KEPTN_API_TOKEN
 
-keptn-automation-demo:
+keptn-automation-cli:
   image: dtdemos/keptn-automation:0.5.0
   variables:
-    EVALUATION_RULE: ignore
     KEPTN_PROJECT: slo-demo
     KEPTN_SERVICE: casdemoapp
     KEPTN_STAGE: production
-    LABELS: "GitLabJob=$CI_JOB_NAME,executedBy=GitLab,GitLabUrl=$CI_PIPELINE_URL"
   script: |
     echo "-------------------------------------------------------"
     echo "keptn version"
@@ -31,7 +29,33 @@ keptn-automation-demo:
     echo "keptn get services --project slo-demo"
     echo "-------------------------------------------------------"
     keptn get services --project slo-demo
+
+keptn-automation-slo:
+  image: dtdemos/keptn-automation:0.5.0
+  variables:
+    KEPTN_PROJECT: slo-demo
+    KEPTN_SERVICE: casdemoapp
+    KEPTN_STAGE: production
+    EVALUATION_RULE: ignore
+    LABELS: "GitLabJob=$CI_JOB_NAME,executedBy=GitLab,GitLabUrl=$CI_PIPELINE_URL"
+  script: |
     echo "-------------------------------------------------------"
     echo "Running slo-evaluation.sh"
     echo "-------------------------------------------------------"
     slo-evaluation.sh
+
+keptn-automation-event:
+  image: dtdemos/keptn-automation:0.5.0
+  variables:
+    KEPTN_PROJECT: slo-demo
+    KEPTN_SERVICE: casdemoapp
+    KEPTN_STAGE: production
+    KEPTN_EVENT_TYPE: sh.keptn.event.production.evaluation.triggered
+    KEPTN_EVENT_SOURCE: GitLab
+    KEPTN_EVENT_LABELS: "\"labels\": { \"GitLabJob\": \"$CI_JOB_NAME\",\"GitLabUrl\": \"$CI_PIPELINE_URL\" }"
+    KEPTN_EVENT_DATA: "\"evaluation\": { \"timeframe\": \"5m\" }"
+  script: |
+    echo "-------------------------------------------------------"
+    echo "Running send-event.sh"
+    echo "-------------------------------------------------------"
+    send-event.sh

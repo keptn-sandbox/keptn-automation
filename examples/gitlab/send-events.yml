@@ -1,0 +1,87 @@
+# https://docs.gitlab.com/ee/ci/triggers/
+# assumes payload of 
+#{
+#  "ref": "master",
+#  "variables": [
+#    { "key": "CA_PROJECT", "value": "{{.data.project}}" },
+#    { "key": "CA_STAGE", "value": "{{.data.stage}}" },
+#    { "key": "CA_SERVICE", "value": "{{.data.service}}" },
+#    { "key": "CA_SHKEPTNCONTEXT", "value": "{{.shkeptncontext}}" },
+#    { "key": "CA_ID", "value": "{{.id}}" }
+#  ]
+#}
+
+stages:
+  - deployment-started
+  - deployment
+  - deployment-finished
+
+deployment-started:
+  stage: deployment-started
+  only:
+    - api
+  image: dtdemos/keptn-automation:0.5.0
+  variables:
+    KEPTN_BASE_URL: $CA_API_URL
+    KEPTN_API_TOKEN: $CA_API_TOKEN
+    KEPTN_PROJECT: $CA_PROJECT
+    KEPTN_SERVICE: $CA_SERVICE
+    KEPTN_STAGE: $CA_STAGE
+    KEPTN_EVENT_TYPE: sh.keptn.event.deployment.started
+    KEPTN_EVENT_SOURCE: GitLab
+    KEPTN_EVENT_RESULT: pass
+    KEPTN_EVENT_STATUS: succeeded
+    KEPTN_EVENT_SHKEPTNCONTEXT: $CA_SHKEPTNCONTEXT
+    KEPTN_EVENT_TRIGGERID: $CA_ID
+
+    DEBUG: "true"
+  script: |
+    echo "-------------------------------------------------------"
+    echo "Running send-event.sh - $KEPTN_EVENT_TYPE"
+    echo "-------------------------------------------------------"
+    send-event.sh
+
+deployment:
+  stage: deployment
+  needs: ["deployment-started"]
+  script:
+    - export DEPLOYMENT_RESULT="pass"  # this is just for testing.  Valid values are pass, fail, warning
+    - echo "**********************************************************************"
+    - echo "Running deployment logic here. DEPLOYMENT_RESULT = $DEPLOYMENT_RESULT"
+    - echo "DEPLOYMENT_RESULT=$DEPLOYMENT_RESULT" >> build.env
+    - echo "**********************************************************************"
+  artifacts:
+    reports:
+      dotenv: build.env
+
+deployment-finished:
+  stage: deployment-finished
+  needs: ["deployment"]
+  script:
+    - |
+      payload=$(cat <<-END
+        {
+      	  "data": {
+            "project": "$CA_PROJECT",
+            "stage": "$CA_STAGE",
+            "service": "$CA_SERVICE",
+            "status": "succeeded",
+            "result": "$DEPLOYMENT_RESULT",
+            "deployment": {
+              "CI_JOB_NAME": "$CI_JOB_NAME",
+              "CI_PIPELINE_URL": "$CI_PIPELINE_URL"
+            },
+            "labels": {
+              "GitLabURL": "$CI_PIPELINE_URL"
+            }
+      	  },
+      	  "source": "gitlab",
+      	  "specversion": "1.0",
+      	  "type": "sh.keptn.event.deployment.finished",
+      	  "shkeptncontext": "$CA_SHKEPTNCONTEXT",
+      	  "triggeredid": "$CA_ID"
+        }
+      END
+      )
+      echo "payload = $payload"
+      curl -X POST "$CA_API_URL/api/v1/event" -H "Content-Type: application/json" -H "accept: application/json" -H "x-token: $CA_API_TOKEN" -d "$payload"
