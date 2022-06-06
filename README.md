@@ -8,6 +8,7 @@ This repo contains scripts to create a container image with the [Keptn CLI](http
 
 1. [Execute ANY Keptn CLI command such as those needed to onboard a service](KEPTN.md)
 1. [Perform SLO Evaluation as a "Quality Gate"](SLO_EVALUATION.md)
+1. [Send a Cloud event to start a sequence or a task](SEND_EVENT.md)
 1. [Create Dynatrace Service secret](CREATE_DYNATRACE_SECRET.md)
 
 ## Examples
@@ -34,7 +35,7 @@ See the [examples](examples/) folder in this repo for example for various platfo
 | 0.10.0                  | dtdemos/keptn-automation:0.2.1 | Adjust SLO output to be JSON format |
 | 0.12.0                  | dtdemos/keptn-automation:0.4.0 | Update to 0.12.0 Keptn CLI |
 | 0.12.6                  | dtdemos/keptn-automation:0.4.1 | Update to 0.12.6 Keptn CLI |
-| 0.13.6                  | dtdemos/keptn-automation:0.5.0 | Update to 0.13.6 Keptn CLI |
+| 0.13.6                  | dtdemos/keptn-automation:0.5.0 | Update to 0.13.6 Keptn CLI, added send-event.sh |
 
 # Development
 
